@@ -1,19 +1,24 @@
 <?php
-session_start();
-require_once('../vendor/autoload.php');
+	session_start();
+	require_once('../vendor/autoload.php');
+	
+	use Validations\isAuth;
+	
+	$isAuth = new isAuth("main/loginForm.php", $_SESSION['user'] ?? null);
+	$isAuth->is_auth();
 
-$connection = new PDO("mysql:host=db;dbname=mydatabase;charset=utf8", "root", "myrootpassword");
-if(!$connection){
+	$connection = new PDO("mysql:host=db;dbname=mydatabase;charset=utf8", "root", "myrootpassword");
+	if(!$connection){
     die("Fatal Error: Connection Failed!");
-}
+	}
 
-$form_id = $_GET['id'];
+	$form_id = $_GET['id'];
 
-$sql = "SELECT * FROM `forms` LEFT JOIN users ON users.id = forms.form_author_id WHERE forms.id = :f_id; ";
-$query = $connection->prepare($sql);
-$query->execute(["f_id" => $form_id]);
+	$sql = "SELECT * FROM `forms` LEFT JOIN users ON users.id = forms.form_author_id WHERE forms.id = :f_id; ";
+	$query = $connection->prepare($sql);
+	$query->execute(["f_id" => $form_id]);
 
-$fetch = $query->fetchAll(PDO::FETCH_ASSOC);
+	$fetch = $query->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!doctype html>

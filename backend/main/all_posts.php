@@ -1,19 +1,25 @@
 <?php
-    session_start();
+	session_start();
+	require_once('../vendor/autoload.php');
 	
-		unset($_SESSION['postErrors']);
+	use Validations\isAuth;
+	
+	$isAuth = new isAuth("login/loginForm.php", $_SESSION['user'] ?? null);
+	$isAuth->is_auth();
+	
+	unset($_SESSION['postErrors']);
 
-    if (!isset($_SESSION['forms_data'])) {
-        header('Location: http://localhost:85/main/getPosts.php');
-        die();
-    }
+	if (!isset($_SESSION['forms_data'])) {
+		header('Location: http://localhost:85/main/getPosts.php');
+		die();
+	}
 		
-		if (isset($_SESSION['errors']) || isset($_SESSION['data'])) {
-			unset($_SESSION['errors']);
-			unset($_SESSION['data']);
-		}
+	if (isset($_SESSION['errors']) || isset($_SESSION['data'])) {
+		unset($_SESSION['errors']);
+		unset($_SESSION['data']);
+	}
 
-    $allData = $_SESSION['forms_data'];
+	$allData = $_SESSION['forms_data'];
 ?>
 
 <!doctype html>

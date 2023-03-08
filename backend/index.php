@@ -1,17 +1,15 @@
 <?php
 	session_start();
+	require_once('vendor/autoload.php');
 	
-	//use Validations\isAuth;
-
+	use Validations\isAuth;
+	
+	$isAuth = new isAuth("login/loginForm.php", $_SESSION['user'] ?? null);
+	$isAuth->is_auth();
+	
 	unset($_SESSION['forms_data']);
 	
-	//$isAuth = new isAuth("loginForm.php", $_SESSION['user']);
-	//$isAuth->is_auth();
-	
-	if (!isset($_SESSION['user'])) {
-		header('Location: http://localhost:85/loginForm.php');
-		die();
-	} else if (isset($_SESSION['errors']) && isset($_SESSION['data'])) {
+	 if (isset($_SESSION['errors']) && isset($_SESSION['data'])) {
 		$errors = $_SESSION['errors'];
 		$data = $_SESSION['data'];
 	}
@@ -78,22 +76,6 @@
                                 rows="10"><?php echo $data['content'] ?? '' ?></textarea>
                     </div>
                     <div><?php echo $errors['content'] ?? '' ?></div>
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label for="email" class="col-md-2 col-form-label">Email  автора для связи</label>
-                <div class="col-md-10">
-                    <div class="input-group">
-                        <input
-                                type="email"
-                                class="form-control <?php echo isset($errors['email']) ? 'border border-danger' : '' ?>"
-                                id="email"
-                                name="email"
-                                value="<?php echo $data['email'] ?? '' ?>"
-                        >
-                    </div>
-                    <div><?php echo $errors['email'] ?? '' ?></div>
                 </div>
             </div>
 

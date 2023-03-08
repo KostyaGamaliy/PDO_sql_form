@@ -6,7 +6,6 @@ use Validations\FormCheck\AnnotationValidate;
 use Validations\FormCheck\CategoryValidate;
 use Validations\FormCheck\ContentValidate;
 use Validations\FormCheck\DateValidate;
-use Validations\FormCheck\EmailValidate;
 use Validations\FormCheck\PublishInIndexValidate;
 use Validations\FormCheck\TitleValidate;
 use Validations\FormCheck\ViewsValidate;
@@ -27,11 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $content_validate = new ContentValidate();
     if ($content_validate->validate($_POST["content"])) {
         $errors["content"] = $content_validate->validate($_POST["content"]);
-    }
-
-    $email_validate = new EmailValidate();
-    if ($email_validate->validate($_POST["email"])) {
-        $errors["email"] = $email_validate->validate($_POST["email"]);
     }
 
     $views_validate = new ViewsValidate();
@@ -61,14 +55,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if(!$errors){
         try{
-            $sql = "UPDATE `forms` SET form_author_id = ?, form_title = ?, form_annotation = ?, form_text = ?, form_author_email = ?, form_watchers_count = ?, form_date_public = ?, form_is_public = ?, form_is_public_home = ?, form_theme = ? WHERE id = ". $_SESSION['u_postId'];
+            $sql = "UPDATE `forms` SET form_author_id = ?, form_title = ?, form_annotation = ?, form_text = ?, form_watchers_count = ?, form_date_public = ?, form_is_public = ?, form_is_public_home = ?, form_theme = ? WHERE id = ". $_SESSION['u_postId'];
             $query = $connection->prepare($sql);
 
             $form_category = ['Спорт', 'Культура', 'Политика'];
 
-            $query->execute([$_SESSION["user"], $_POST["title"], $_POST["annotation"],
-                $_POST["content"], $_POST["email"], $_POST["views"],
-                $_POST["date"], isset($_POST["is_publish"]) ? 1 : 0,
+            $query->execute([$_SESSION["user"], $_POST["title"], $_POST["annotation"], $_POST["content"], $_POST["views"], $_POST["date"], isset($_POST["is_publish"]) ? 1 : 0,
                 $_POST["publish_in_index"] === "true" ? 1 : 0, $form_category[$_POST["category"] - 1]]);
         }catch(PDOException $e){
             echo $e->getMessage();

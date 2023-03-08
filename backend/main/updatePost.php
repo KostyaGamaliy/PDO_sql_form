@@ -2,6 +2,11 @@
 session_start();
 	require_once('../vendor/autoload.php');
 	
+	use Validations\isAuth;
+	
+	$isAuth = new isAuth("main/loginForm.php", $_SESSION['user'] ?? null);
+	$isAuth->is_auth();
+	
 	$_SESSION['u_postId'] = (int)$_GET["id"];
 	$form_category = ['Спорт', 'Культура', 'Политика'];
 	$postData = [];
@@ -86,22 +91,6 @@ session_start();
                                 rows="10"><?php echo $postData['form_text']; ?></textarea>
                     </div>
                     <div><?php echo $errors['content'] ?? '' ?></div>
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label for="email" class="col-md-2 col-form-label">Email  автора для связи</label>
-                <div class="col-md-10">
-                    <div class="input-group">
-                        <input
-                                type="email"
-                                class="form-control <?php echo isset($errors['email']) ? 'border border-danger' : '' ?>"
-                                id="email"
-                                name="email"
-                                value="<?php echo $postData['form_author_email']; ?>"
-                        >
-                    </div>
-                    <div><?php echo $errors['email'] ?? '' ?></div>
                 </div>
             </div>
 

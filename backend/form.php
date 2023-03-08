@@ -6,7 +6,6 @@ session_start();
 	use Validations\FormCheck\CategoryValidate;
 	use Validations\FormCheck\ContentValidate;
 	use Validations\FormCheck\DateValidate;
-	use Validations\FormCheck\EmailValidate;
 	use Validations\FormCheck\PublishInIndexValidate;
 	use Validations\FormCheck\TitleValidate;
 	use Validations\FormCheck\ViewsValidate;
@@ -27,11 +26,6 @@ session_start();
 		$content_validate = new ContentValidate();
 		if ($content_validate->validate($_POST["content"])) {
 			$errors["content"] = $content_validate->validate($_POST["content"]);
-		}
-
-		$email_validate = new EmailValidate();
-		if ($email_validate->validate($_POST["email"])) {
-			$errors["email"] = $email_validate->validate($_POST["email"]);
 		}
 
 		$views_validate = new ViewsValidate();
@@ -73,14 +67,14 @@ session_start();
                         }
                     }
                 } else if (isset($errors)){
-                    $sql = "INSERT forms(form_author_id, form_title, form_annotation, form_text, form_author_email, form_watchers_count, form_date_public, form_is_public, form_is_public_home, form_theme) 
-                    VALUE (:f_author_id, :f_title, :f_annotation, :f_text, :f_author_email, :f_watchers_count, :f_date_public, :f_is_public, :f_is_public_home, :f_theme)";
+                    $sql = "INSERT forms(form_author_id, form_title, form_annotation, form_text, form_watchers_count, form_date_public, form_is_public, form_is_public_home, form_theme)
+                    VALUE (:f_author_id, :f_title, :f_annotation, :f_text, :f_watchers_count, :f_date_public, :f_is_public, :f_is_public_home, :f_theme)";
                     $query = $connection->prepare($sql);
 
                     $form_category = ['Спорт', 'Культура', 'Политика'];
 
                     $query->execute(['f_author_id' => $_SESSION["user"], 'f_title' => $_POST["title"], 'f_annotation' => $_POST["annotation"],
-                        'f_text' => $_POST["content"], 'f_author_email' => $_POST["email"], 'f_watchers_count' => $_POST["views"],
+                        'f_text' => $_POST["content"], 'f_watchers_count' => $_POST["views"],
                         'f_date_public' => $_POST["date"], 'f_is_public' => isset($_POST["is_publish"]) ? 1 : 0,
                         'f_is_public_home' => $_POST["publish_in_index"] === "true" ? 1 : 0, 'f_theme' => $form_category[$_POST["category"] - 1]]);
                 }
