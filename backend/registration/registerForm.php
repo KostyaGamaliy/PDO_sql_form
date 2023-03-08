@@ -60,7 +60,7 @@
 				</div>
 				<div class="d-flex justify-content-around" role="group" aria-label="Two buttons">
 					<button type="submit" class="btn btn-primary">Зарегиестрироваться</button>
-					<a type="button" class="btn btn-primary" href="loginForm.php">Уже есть аккаунт</a>
+					<a type="button" class="btn btn-primary" href="../login/loginForm.php">Уже есть аккаунт</a>
 				</div>
 			</form>
 

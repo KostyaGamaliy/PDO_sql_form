@@ -1,19 +1,27 @@
 <?php
-	session_start();
+session_start();
+	require_once('../vendor/autoload.php');
 	
-	//use Validations\isAuth;
-
-	unset($_SESSION['forms_data']);
+	$_SESSION['u_postId'] = (int)$_GET["id"];
+	$form_category = ['Спорт', 'Культура', 'Политика'];
+	$postData = [];
 	
-	//$isAuth = new isAuth("loginForm.php", $_SESSION['user']);
-	//$isAuth->is_auth();
+	$connection = new PDO("mysql:host=db;dbname=mydatabase;charset=utf8", "root", "myrootpassword");
+	if (!$connection) {
+		die("Fatal Error: Connection Failed!");
+	}
+		
+	$sql = "SELECT * FROM `forms` WHERE id = :f_id; ";
+	$query = $connection->prepare($sql);
+	$query->execute(["f_id" => $_SESSION['u_postId']]);
+		
+	$fetch = $query->fetchAll(PDO::FETCH_ASSOC);
+	$postData = $fetch[0];
+		
+	$postData['form_theme'] = array_search($postData['form_theme'], $form_category) + 1;
 	
-	if (!isset($_SESSION['user'])) {
-		header('Location: http://localhost:85/loginForm.php');
-		die();
-	} else if (isset($_SESSION['errors']) && isset($_SESSION['data'])) {
-		$errors = $_SESSION['errors'];
-		$data = $_SESSION['data'];
+	if (isset($_SESSION['postErrors'])) {
+		$errors = $_SESSION['postErrors'];
 	}
 ?>
 
@@ -33,7 +41,7 @@
 <div class="container">
     <div class="row">
 
-        <form style="width: 100%" method="post" action="form.php">
+        <form style="width: 100%" method="post" action="updateCheck.php">
             <div class="form-group row">
                 <label for="title" class="col-md-2 col-form-label">Заголовок</label>
                 <div class="col-md-10">
@@ -43,7 +51,7 @@
                                 class="form-control <?php echo isset($errors['title']) ? 'border border-danger' : '' ?>"
                                 id="title"
                                 name="title"
-                                value="<?php echo $data['title'] ?? '' ?>"
+                                value="<?php echo $postData['form_title']; ?>"
                         >
 
                     </div>
@@ -60,7 +68,7 @@
                                 id="annotation"
                                 class="form-control <?php echo isset($errors['annotation']) ? 'border border-danger' : '' ?>"
                                 cols="30"
-                                rows="10"><?php echo $data['annotation'] ?? '' ?></textarea>
+                                rows="10"><?php echo $postData['form_annotation']; ?></textarea>
                     </div>
                     <div><?php echo $errors['annotation'] ?? '' ?></div>
                 </div>
@@ -75,7 +83,7 @@
                                 id="content"
                                 class="form-control <?php echo isset($errors['content']) ? 'border border-danger' : '' ?>"
                                 cols="30"
-                                rows="10"><?php echo $data['content'] ?? '' ?></textarea>
+                                rows="10"><?php echo $postData['form_text']; ?></textarea>
                     </div>
                     <div><?php echo $errors['content'] ?? '' ?></div>
                 </div>
@@ -90,7 +98,7 @@
                                 class="form-control <?php echo isset($errors['email']) ? 'border border-danger' : '' ?>"
                                 id="email"
                                 name="email"
-                                value="<?php echo $data['email'] ?? '' ?>"
+                                value="<?php echo $postData['form_author_email']; ?>"
                         >
                     </div>
                     <div><?php echo $errors['email'] ?? '' ?></div>
@@ -106,7 +114,7 @@
                                 class="form-control <?php echo isset($errors['views']) ? 'border border-danger' : '' ?>"
                                 id="views"
                                 name="views"
-                                value="<?php echo $data['views'] ?? '' ?>"
+                                value="<?php echo $postData['form_watchers_count']; ?>"
                         >
                     </div>
                     <div><?php echo $errors['views'] ?? '' ?></div>
@@ -122,7 +130,7 @@
                                 class="form-control <?php echo isset($errors['date']) ? 'border border-danger' : '' ?>"
                                 id="date"
                                 name="date"
-                                value="<?php echo $data['date'] ?? '' ?>"
+                                value="<?php echo $postData['form_date_public']; ?>"
                         >
                     </div>
                     <div><?php echo $errors['date'] ?? '' ?></div>
@@ -137,7 +145,7 @@
                             class="form-control"
                             id="is_publish"
                             name="is_publish"
-                            <?php echo isset($data['is_publish']) && $data['is_publish'] === "on" ? "checked" : "" ?>
+                        <?php echo (bool)$postData['form_is_public'] ? "checked" : "" ?>
                     >
                     <div class="invalid-feedback"></div>
                 </div>
@@ -153,7 +161,7 @@
                                 name="publish_in_index"
                                 id="publish_in_index_yes"
                                 value="true"
-                                <?php echo isset($data['publish_in_index']) && $data['publish_in_index'] === "true" ? "checked" : "" ?>
+                            <?php echo (bool)$postData['form_is_public_home'] ? "checked" : "" ?>
                         >
                         <label class="form-check-label" for="publish_in_index_yes">
                             Да
@@ -166,7 +174,7 @@
                                 name="publish_in_index"
                                 id="publish_in_index_no"
                                 value="false"
-                                <?php echo isset($data['publish_in_index']) && $data['publish_in_index'] === "false" ? "checked" : "" ?>
+                            <?php echo !(bool)$postData['form_is_public_home'] ? "checked" : "" ?>
                         >
                         <label class="form-check-label" for="publish_in_index_no">
                             Нет
@@ -182,9 +190,9 @@
                     <div>
                         <select id="category" class="form-control <?php echo isset($errors['category']) ? 'border border-danger' : '' ?>" name="category" >
                             <option disabled selected>Выберете категорию из списка..</option>
-                            <option value="1" <?php echo isset($data['category']) && $data['category'] === "1" ? "selected" : "" ?>>Спорт</option>
-                            <option value="2" <?php echo isset($data['category']) && $data['category'] === "2" ? "selected" : "" ?>>Культура</option>
-                            <option value="3" <?php echo isset($data['category']) && $data['category'] === "3" ? "selected" : "" ?>>Политика</option>
+                            <option value="1" <?php echo $postData['form_theme'] === 1 ? "selected" : "" ?>>Спорт</option>
+                            <option value="2" <?php echo $postData['form_theme'] === 2 ? "selected" : "" ?>>Культура</option>
+                            <option value="3" <?php echo $postData['form_theme'] === 3 ? "selected" : "" ?>>Политика</option>
                         </select>
                     </div>
                     <div><?php echo $errors['category'] ?? '' ?></div>
@@ -194,13 +202,7 @@
             <div class="form-group row">
                 <div class="col-md-9">
 
-	                <button type="submit" class="btn btn-primary">Отправить</button>
-                    <a href="main/all_posts.php" class="btn btn-primary">
-                        Список всех статей
-                    </a>
-                    <a href="login/loginForm.php" class="btn btn-primary">
-                        Выйти из аккаунта
-                    </a>
+                    <button type="submit" class="btn btn-primary">Обновить</button>
 
                 </div>
                 <div class="col-md-3 <?php if (!isset($errors)) echo 'd-none' ?>">
@@ -212,6 +214,5 @@
         </form>
 
     </div>
-</div>
 </body>
 </html>

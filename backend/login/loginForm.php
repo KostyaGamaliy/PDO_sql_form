@@ -1,6 +1,8 @@
 <?php
 	session_start();
-	if (isset($_SESSION['loginErrors']) && isset($_SESSION['loginData'])) {
+	session_destroy();
+
+	if (isset($_SESSION['loginErrors'])) {
 		$errors = $_SESSION['loginErrors'];
 		$data = $_SESSION['loginData'];
 	}
@@ -15,6 +17,7 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<title>Palmo</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
 
@@ -31,12 +34,12 @@
 				</div>
 				<div class="form-group">
 					<label for="password">Password</label>
-					<input type="password" class="form-control <?php echo isset($errors['user_password']) ? 'border border-danger' : '' ?>" placeholder="Enter your password" name="user_password" value="<?php echo $data['user_password'] ?? '' ?>">
-					<div><?php echo $errors['user_password'] ?? '' ?></div>
+					<input type="password" class="form-control <?php echo isset($errors['user_login']) ? 'border border-danger' : '' ?>" placeholder="Enter your password" name="user_password" value="<?php echo $data['user_password'] ?? '' ?>">
+					<div><?php echo $errors['user_login'] ?? '' ?></div>
 				</div>
 				<div class="d-flex justify-content-around" role="group" aria-label="Two buttons">
 					<button type="submit" class="btn btn-primary">Войти</button>
-					<a type="button" class="btn btn-primary" href="registerForm.php">Зарегиестрироваться</a>
+					<a type="button" class="btn btn-primary" href="../registration/registerForm.php">Зарегиестрироваться</a>
 				</div>
 			</form>
 
@@ -44,6 +47,6 @@
 	</div>
 </div>
 
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 </html>
